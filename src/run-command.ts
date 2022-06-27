@@ -3,8 +3,8 @@ import stripColor = require('strip-color')
 import { log, logError } from './log'
 
 export async function runCommand(text: string, command: string, filename: string, workspacePath: string): Promise<string> {
-	const args = command.replace(/\$FILE/g, filename).split(' ')
-	const file = args.shift()
+	const cmd = command.replace(/\$FILE(?![\w\d_])/g, filename)
+	const file = cmd.split(' ').shift()
 
 	if (!file) return text
 
@@ -19,12 +19,12 @@ export async function runCommand(text: string, command: string, filename: string
 	const startMs = Date.now()
 
 	try {
-		const { stdout, stderr } = await execa(file, args, { input: text, cwd: workspacePath })
+		const { stdout, stderr } = await execa( cmd, null, { input: text, cwd: workspacePath })
 
 		if (stderr.length) errorOut(stderr)
 
 		if (stdout.length) {
-			log(`Formatted ${filename} in ${Date.now() - startMs}ms using the following command:\n> ${command}`)
+			log(`Formatted ${filename} in ${Date.now() - startMs}ms using the following command:\n> ${cmd}`)
 			return stdout
 		}
 

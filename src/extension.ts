@@ -48,13 +48,14 @@ export function activate(context: ExtensionContext) {
 					const workspaceDir = getCwd(filename)
 					const formattedText = await runCommand(rawText, formatter.command, filename, workspaceDir)
 
+					if(formatter.ignoreOutput == true)
+						return null;
 					const lastLineNumber = document.lineCount - 1
 					const lastLineChar = document.lineAt(lastLineNumber).text.length
 
 					const startPos = new Position(0, 0)
 					const endPos = new Position(lastLineNumber, lastLineChar)
 					const replaceRange = new Range(startPos, endPos)
-
 					return [TextEdit.replace(replaceRange, formattedText)]
 				},
 			})
